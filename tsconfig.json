@@ -1,5 +1,9 @@
 {
   "extends": "@total-typescript/tsconfig/tsc/no-dom/app",
+  "compilerOptions": {
+    "outDir": "dist",
+    "sourceMap": false
+  },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.test.ts"]
 }

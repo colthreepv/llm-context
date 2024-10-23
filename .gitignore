@@ -3,3 +3,6 @@ node_modules
 
 # context files
 llm-context.*
+
+# build
+dist
