@@ -1,2 +1,5 @@
 # dependencies
 node_modules
+
+# context files
+llm-context.*

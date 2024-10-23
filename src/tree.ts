@@ -30,6 +30,9 @@ function buildTree(dirPath: string, ignorePaths: Set<string>): TreeNode {
       if (ignorePaths.has(entry))
         continue
 
+      if (entry.startsWith('llm-context'))
+        continue
+
       const fullPath = join(dirPath, entry)
       const childNode = buildTree(fullPath, ignorePaths)
       node.children.push(childNode)

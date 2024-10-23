@@ -83,50 +83,54 @@ export function readFilesInDirectory(
   ])
 
   let context = ''
+  let files: string[]
 
   try {
-    const files = readdirSync(directoryPath)
-
-    for (const file of files) {
-      if (ignorePaths.has(file))
-        continue
-
-      const filePath = join(directoryPath, file)
-      const stats = statSync(filePath)
-      const relativePath = relative(basePath, filePath)
-
-      // Skip directories that match ignore patterns
-      if (stats.isDirectory()) {
-        context += readFilesInDirectory(filePath, basePath, options)
-        continue
-      }
-
-      // Skip specific files
-      if (file.startsWith('llm-context'))
-        continue
-      if (isBinaryFile(filePath))
-        continue
-
-      try {
-        let content = readFileSync(filePath, 'utf8')
-
-        // Handle JSON files
-        if (isJSONFile(filePath) && options.truncateJSON !== false)
-          content = truncateJSON(content)
-
-        // Format output based on specified format
-        if (options.outputFormat === 'xml')
-          context += `\n<file name="${relativePath}">\n${content}\n</file>\n`
-        else
-          context += `\n# ${relativePath}\n\n${content}\n`
-      }
-      catch (error) {
-        console.error(`Error reading file ${filePath}:`, error)
-      }
-    }
+    files = readdirSync(directoryPath)
   }
   catch (error) {
     console.error(`Error reading directory ${directoryPath}:`, error)
+    return context
+  }
+
+  for (const file of files) {
+    if (ignorePaths.has(file))
+      continue
+
+    const filePath = join(directoryPath, file)
+    const stats = statSync(filePath)
+    const relativePath = relative(basePath, filePath)
+
+    // Skip directories that match ignore patterns
+    if (stats.isDirectory()) {
+      context += readFilesInDirectory(filePath, basePath, options)
+      continue
+    }
+
+    // Skip specific files
+    if (file.startsWith('llm-context'))
+      continue
+    if (isBinaryFile(filePath))
+      continue
+
+    try {
+      let content = readFileSync(filePath, 'utf8')
+
+      // Handle JSON files
+      if (isJSONFile(filePath) && options.truncateJSON !== false)
+        content = truncateJSON(content)
+
+      // Use the tokenized format
+      context += `<|START_FILE|>\n`
+      context += `File: ${relativePath}\n`
+      context += `<|START_CONTENT|>\n`
+      context += `${content}\n`
+      context += `<|END_CONTENT|>\n`
+      context += `<|END_FILE|>\n\n`
+    }
+    catch (error) {
+      console.error(`Error reading file ${filePath}:`, error)
+    }
   }
 
   return context

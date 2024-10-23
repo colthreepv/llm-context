@@ -53,26 +53,34 @@ describe('readFilesInDirectory', () => {
     writeFileSync(join(testDir, 'subdir', 'nested.txt'), 'Nested')
   })
 
-  it('should read files in text format', () => {
-    const result = readFilesInDirectory(testDir, testDir)
-    expect(result).toContain('# test.txt')
-    expect(result).toContain('Hello')
-    expect(result).toContain('# subdir/nested.txt')
-    expect(result).toContain('Nested')
+  afterAll(() => {
+    rmdirSync(testDir, { recursive: true })
   })
 
-  it('should read files in XML format', () => {
-    const result = readFilesInDirectory(testDir, testDir, {
-      outputFormat: 'xml',
-    })
-    expect(result).toContain('<file name="test.txt">')
+  it('should read files and format them with tokenized delimiters', () => {
+    const result = readFilesInDirectory(testDir, testDir)
+    expect(result).toContain('<|START_FILE|>')
+    expect(result).toContain('File: test.txt')
+    expect(result).toContain('<|START_CONTENT|>')
     expect(result).toContain('Hello')
-    expect(result).toContain('</file>')
+    expect(result).toContain('<|END_CONTENT|>')
+    expect(result).toContain('<|END_FILE|>')
+  })
+
+  it('should include all files in the correct format', () => {
+    const result = readFilesInDirectory(testDir, testDir)
+    expect(result).toContain('File: test.txt')
+    expect(result).toContain('Hello')
+    expect(result).toContain('File: test.json')
+    expect(result).toContain(truncatedJson)
+    expect(result).toContain('File: subdir/nested.txt')
+    expect(result).toContain('Nested')
   })
 
   it('should truncate JSON files by default', () => {
     const result = readFilesInDirectory(testDir, testDir)
     expect(result).toContain(truncatedJson)
+    expect(result).not.toContain('"e": 5') // Ensure that the extra key is not included
   })
 
   it('should respect ignore paths', () => {
@@ -80,5 +88,6 @@ describe('readFilesInDirectory', () => {
       ignorePaths: ['subdir'],
     })
     expect(result).not.toContain('nested.txt')
+    expect(result).not.toContain('File: subdir/nested.txt')
   })
 })
