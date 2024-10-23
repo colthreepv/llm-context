@@ -1,0 +1,30 @@
+{
+  "name": "llm-context",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b",
+  "description": "A CLI tool to build context files for LLMs",
+  "license": "UNLICENSED",
+  "main": "dist/index.js",
+  "bin": {
+    "llm-context": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src/**/*.ts",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.7.0",
+    "@total-typescript/tsconfig": "^1.0.4",
+    "@types/node": "^22.7.9",
+    "eslint": "^8.57.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}
