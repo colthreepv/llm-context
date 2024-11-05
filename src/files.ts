@@ -116,17 +116,12 @@ export function readFilesInDirectory(
     try {
       let content = readFileSync(filePath, 'utf8')
 
-      // Handle JSON files
       if (isJSONFile(filePath) && options.truncateJSON !== false)
         content = truncateJSON(content)
 
-      // Use the tokenized format
-      context += `<|START_FILE|>\n`
-      context += `File: ${relativePath}\n`
-      context += `<|START_CONTENT|>\n`
+      context += `<file name="${relativePath}">\n`
       context += `${content}\n`
-      context += `<|END_CONTENT|>\n`
-      context += `<|END_FILE|>\n\n`
+      context += `</file>\n`
     }
     catch (error) {
       console.error(`Error reading file ${filePath}:`, error)

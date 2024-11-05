@@ -41,4 +41,5 @@ program
     console.log(`\nEstimated Tokens: ${estimatedTokens}`)
   })
 
+program.showHelpAfterError()
 program.parse()

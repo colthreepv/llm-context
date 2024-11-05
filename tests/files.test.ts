@@ -59,21 +59,18 @@ describe('readFilesInDirectory', () => {
 
   it('should read files and format them with tokenized delimiters', () => {
     const result = readFilesInDirectory(testDir, testDir)
-    expect(result).toContain('<|START_FILE|>')
-    expect(result).toContain('File: test.txt')
-    expect(result).toContain('<|START_CONTENT|>')
+    expect(result).toContain('<file name="test.txt">')
     expect(result).toContain('Hello')
-    expect(result).toContain('<|END_CONTENT|>')
-    expect(result).toContain('<|END_FILE|>')
+    expect(result).toContain('</file>')
   })
 
   it('should include all files in the correct format', () => {
     const result = readFilesInDirectory(testDir, testDir)
-    expect(result).toContain('File: test.txt')
+    expect(result).toContain('<file name="test.txt">')
     expect(result).toContain('Hello')
-    expect(result).toContain('File: test.json')
+    expect(result).toContain('<file name="test.json">')
     expect(result).toContain(truncatedJson)
-    expect(result).toContain('File: subdir/nested.txt')
+    expect(result).toContain('<file name="subdir/nested.txt">')
     expect(result).toContain('Nested')
   })
 
