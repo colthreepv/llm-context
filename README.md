@@ -12,6 +12,20 @@ llm-context <directory> <suffix> [options]
 - `<directory>`: The directory to process.
 - `<suffix>`: The output file suffix.
 
+For local development:
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/llm-context.git
+cd llm-context
+
+# Install dependencies
+pnpm install
+
+# Link globally to invoke it everywhere
+pnpm build
+pnpm link --global
+```
+
 ### Options
 
 - `-i, --ignore <paths...>`: Additional paths to ignore during processing.
