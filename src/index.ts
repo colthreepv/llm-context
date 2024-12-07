@@ -3,9 +3,9 @@ import { parseArgs } from 'node:util'
 import { join } from 'node:path'
 import { cwd, exit } from 'node:process'
 import { writeFileSync } from 'node:fs'
-import { version as pkgVersion } from '../package.json'
 import { readFilesInDirectory } from './files.js'
 import { getTreeOutput } from './tree.js'
+import { VERSION } from './version.js'
 
 function estimateTokens(text: string): number {
   return Math.ceil(text.length / 3.622831)
@@ -54,7 +54,7 @@ if (help) {
 }
 
 if (version) {
-  console.log(pkgVersion)
+  console.log(VERSION)
   exit(0)
 }
 
