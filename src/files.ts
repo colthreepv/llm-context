@@ -2,6 +2,7 @@ import { closeSync, openSync, readFileSync, readSync, readdirSync, statSync } fr
 import { extname, join, relative } from 'node:path'
 import { Buffer } from 'node:buffer'
 import { BINARY_CHECK_BUFFER_SIZE, DEFAULT_IGNORE_PATHS, MAX_JSON_ARRAY_ITEMS, MAX_JSON_ENTRIES } from './constants.js'
+import { matchesPattern } from './ignore.js'
 
 export interface FileNode {
   name: string
@@ -77,10 +78,10 @@ export function readFilesInDirectory(
   basePath: string,
   options: ContextOptions = {},
 ): string {
-  const ignorePaths = new Set([
+  const ignorePaths = [
     ...DEFAULT_IGNORE_PATHS,
     ...(options.ignorePaths || []),
-  ])
+  ]
 
   let context = ''
   let files: string[]
@@ -94,7 +95,9 @@ export function readFilesInDirectory(
   }
 
   for (const file of files) {
-    if (ignorePaths.has(file))
+    if (ignorePaths.includes(file))
+      continue
+    if (ignorePaths.some(pattern => matchesPattern(file, pattern)))
       continue
 
     const filePath = join(directoryPath, file)

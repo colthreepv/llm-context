@@ -1,4 +1,4 @@
-import { mkdirSync, rmdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { Buffer } from 'node:buffer'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -12,7 +12,7 @@ describe('fileUtils', () => {
   })
 
   afterAll(() => {
-    rmdirSync(testDir, { recursive: true })
+    rmSync(testDir, { recursive: true })
   })
 
   describe('isJSONFile', () => {
@@ -54,7 +54,7 @@ describe('readFilesInDirectory', () => {
   })
 
   afterAll(() => {
-    rmdirSync(testDir, { recursive: true })
+    rmSync(testDir, { recursive: true })
   })
 
   it('should read files and format them with tokenized delimiters', () => {
@@ -86,5 +86,28 @@ describe('readFilesInDirectory', () => {
     })
     expect(result).not.toContain('nested.txt')
     expect(result).not.toContain('File: subdir/nested.txt')
+  })
+
+  it('should handle ignore wildcards', () => {
+    // Create test files with "tree" in name
+    writeFileSync(join(testDir, 'tree.txt'), 'Tree content')
+    writeFileSync(join(testDir, 'mytree.js'), 'console.log("tree")')
+    writeFileSync(join(testDir, 'treefile.md'), '# Tree doc')
+    writeFileSync(join(testDir, 'normal.txt'), 'Normal file')
+
+    const result = readFilesInDirectory(testDir, testDir, {
+      ignorePaths: ['*tree*'],
+    })
+
+    // Should include files without "tree"
+    expect(result).toContain('<file name="normal.txt">')
+    expect(result).toContain('<file name="test.txt">')
+    expect(result).toContain('<file name="test.json">')
+    expect(result).toContain('<file name="subdir/nested.txt">')
+
+    // Should exclude files with "tree"
+    expect(result).not.toContain('<file name="tree.txt">')
+    expect(result).not.toContain('<file name="mytree.js">')
+    expect(result).not.toContain('<file name="treefile.md">')
   })
 })

@@ -1,4 +1,4 @@
-import { mkdirSync, rmdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { getTreeOutput } from '../src/tree.js'
@@ -14,7 +14,7 @@ describe('tree.util', () => {
   })
 
   afterAll(() => {
-    rmdirSync(testDir, { recursive: true })
+    rmSync(testDir, { recursive: true })
   })
 
   describe('getTreeOutput', () => {
@@ -32,6 +32,26 @@ describe('tree.util', () => {
       mkdirSync(join(testDir, 'node_modules'))
       const result = getTreeOutput(testDir, ['node_modules'])
       expect(result).not.toContain('node_modules')
+    })
+
+    it('should handle ignore wildcards', () => {
+      writeFileSync(join(testDir, 'foo.txt'), 'Foo content')
+      writeFileSync(join(testDir, 'myfoo.js'), 'console.log("foo")')
+      writeFileSync(join(testDir, 'foofile.md'), '# Foo doc')
+      writeFileSync(join(testDir, 'normal.txt'), 'Normal file')
+
+      const result = getTreeOutput(testDir, ['*foo*'])
+
+      // Should include files without "tree"
+      expect(result).toContain('file1.txt')
+      expect(result).toContain('file2.txt')
+      expect(result).toContain('normal.txt')
+      expect(result).toContain('dir1')
+
+      // Should exclude files with "tree"
+      expect(result).not.toContain('foo.txt')
+      expect(result).not.toContain('myfoo.js')
+      expect(result).not.toContain('foofile.md')
     })
   })
 })

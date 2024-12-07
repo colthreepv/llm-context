@@ -1,6 +1,7 @@
 import { readdirSync, statSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { DEFAULT_IGNORE_PATHS } from './constants.js'
+import { matchesPattern } from './ignore.js'
 
 interface TreeNode {
   name: string
@@ -9,7 +10,10 @@ interface TreeNode {
 }
 
 export function getTreeOutput(directoryPath: string, additionalPaths: string[] = []): string {
-  const ignorePaths = new Set([...DEFAULT_IGNORE_PATHS, ...additionalPaths])
+  const ignorePaths = [
+    ...DEFAULT_IGNORE_PATHS,
+    ...(additionalPaths || []),
+  ]
 
   const tree = buildTree(directoryPath, ignorePaths)
   const treeString = formatTreeOutput(tree)
@@ -17,7 +21,7 @@ export function getTreeOutput(directoryPath: string, additionalPaths: string[] =
   return `<tree>\n${treeString}\n</tree>`
 }
 
-function buildTree(dirPath: string, ignorePaths: Set<string>): TreeNode {
+function buildTree(dirPath: string, ignorePaths: string[]): TreeNode {
   const name = basename(dirPath)
   const stats = statSync(dirPath)
   const node: TreeNode = { name, type: stats.isDirectory() ? 'directory' : 'file' }
@@ -27,10 +31,9 @@ function buildTree(dirPath: string, ignorePaths: Set<string>): TreeNode {
     const entries = readdirSync(dirPath)
 
     for (const entry of entries) {
-      if (ignorePaths.has(entry))
+      if (ignorePaths.includes(entry))
         continue
-
-      if (entry.startsWith('llm-context'))
+      if (ignorePaths.some(pattern => matchesPattern(entry, pattern)))
         continue
 
       const fullPath = join(dirPath, entry)
