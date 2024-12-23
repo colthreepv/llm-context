@@ -4,6 +4,10 @@ A CLI tool that builds context files from your project for Large Language Models
 
 ## Installation
 
+```bash
+npm install -g llm-context
+```
+
 For development:
 ```bash
 git clone https://github.com/colthreepv/llm-context
