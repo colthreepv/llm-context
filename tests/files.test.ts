@@ -58,14 +58,14 @@ describe('readFilesInDirectory', () => {
   })
 
   it('should read files and format them with tokenized delimiters', () => {
-    const result = readFilesInDirectory(testDir, testDir)
+    const { context: result } = readFilesInDirectory(testDir, testDir)
     expect(result).toContain('<file name="test.txt">')
     expect(result).toContain('Hello')
     expect(result).toContain('</file>')
   })
 
   it('should include all files in the correct format', () => {
-    const result = readFilesInDirectory(testDir, testDir)
+    const { context: result } = readFilesInDirectory(testDir, testDir)
     expect(result).toContain('<file name="test.txt">')
     expect(result).toContain('Hello')
     expect(result).toContain('<file name="test.json">')
@@ -75,13 +75,13 @@ describe('readFilesInDirectory', () => {
   })
 
   it('should truncate JSON files by default', () => {
-    const result = readFilesInDirectory(testDir, testDir)
+    const { context: result } = readFilesInDirectory(testDir, testDir)
     expect(result).toContain(truncatedJson)
     expect(result).not.toContain('"e": 5') // Ensure that the extra key is not included
   })
 
   it('should respect ignore paths', () => {
-    const result = readFilesInDirectory(testDir, testDir, {
+    const { context: result } = readFilesInDirectory(testDir, testDir, {
       ignorePaths: ['subdir'],
     })
     expect(result).not.toContain('nested.txt')
@@ -95,7 +95,7 @@ describe('readFilesInDirectory', () => {
     writeFileSync(join(testDir, 'treefile.md'), '# Tree doc')
     writeFileSync(join(testDir, 'normal.txt'), 'Normal file')
 
-    const result = readFilesInDirectory(testDir, testDir, {
+    const { context: result } = readFilesInDirectory(testDir, testDir, {
       ignorePaths: ['*tree*'],
     })
 
@@ -109,5 +109,12 @@ describe('readFilesInDirectory', () => {
     expect(result).not.toContain('<file name="tree.txt">')
     expect(result).not.toContain('<file name="mytree.js">')
     expect(result).not.toContain('<file name="treefile.md">')
+  })
+
+  it('should return tokensMap for each file', () => {
+    const { tokensMap } = readFilesInDirectory(testDir, testDir)
+
+    expect(tokensMap.has('test.txt')).toBe(true)
+    expect(tokensMap.get('test.txt')).toBeGreaterThanOrEqual(1)
   })
 })

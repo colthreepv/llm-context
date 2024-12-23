@@ -4,6 +4,10 @@ import { Buffer } from 'node:buffer'
 import { BINARY_CHECK_BUFFER_SIZE, DEFAULT_IGNORE_PATHS, MAX_JSON_ARRAY_ITEMS, MAX_JSON_ENTRIES } from './constants.js'
 import { matchesPattern } from './ignore.js'
 
+export function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 3.622831)
+}
+
 export interface FileNode {
   name: string
   type: 'file' | 'directory'
@@ -77,13 +81,15 @@ export function readFilesInDirectory(
   directoryPath: string,
   basePath: string,
   options: ContextOptions = {},
-): string {
+): { context: string, tokensMap: Map<string, number> } {
   const ignorePaths = [
     ...DEFAULT_IGNORE_PATHS,
     ...(options.ignorePaths || []),
   ]
 
   let context = ''
+  const tokensMap = new Map<string, number>()
+
   let files: string[]
 
   try {
@@ -91,7 +97,7 @@ export function readFilesInDirectory(
   }
   catch (error) {
     console.error(`Error reading directory ${directoryPath}:`, error)
-    return context
+    return { context: '', tokensMap }
   }
 
   for (const file of files) {
@@ -106,7 +112,13 @@ export function readFilesInDirectory(
 
     // Skip directories that match ignore patterns
     if (stats.isDirectory()) {
-      context += readFilesInDirectory(filePath, basePath, options)
+      const { context: childContext, tokensMap: childTokens }
+        = readFilesInDirectory(filePath, basePath, options)
+      context += childContext
+      // Merge child tokens into our tokensMap
+      for (const [k, v] of childTokens)
+        tokensMap.set(k, v)
+
       continue
     }
 
@@ -122,6 +134,10 @@ export function readFilesInDirectory(
       if (isJSONFile(filePath) && options.truncateJSON !== false)
         content = truncateJSON(content)
 
+      // Compute tokens and store in the map
+      const fileTokenCount = estimateTokens(content)
+      tokensMap.set(relativePath, fileTokenCount)
+
       context += `<file name="${relativePath}">\n`
       context += `${content}\n`
       context += `</file>\n`
@@ -131,5 +147,5 @@ export function readFilesInDirectory(
     }
   }
 
-  return context
+  return { context, tokensMap }
 }

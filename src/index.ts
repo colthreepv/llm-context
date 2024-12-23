@@ -3,13 +3,9 @@ import { parseArgs } from 'node:util'
 import { join } from 'node:path'
 import { cwd, exit } from 'node:process'
 import { writeFileSync } from 'node:fs'
-import { readFilesInDirectory } from './files.js'
+import { estimateTokens, readFilesInDirectory } from './files.js'
 import { getTreeOutput } from './tree.js'
 import { VERSION } from './version.js'
-
-function estimateTokens(text: string): number {
-  return Math.ceil(text.length / 3.622831)
-}
 
 function printUsage() {
   console.log(`
@@ -71,8 +67,9 @@ const outputPath = `llm-context.${suffix}.txt`
 if (Array.isArray(ignorePaths))
   console.log('Ignoring paths:', ignorePaths)
 
-const treeOutput = getTreeOutput(directoryPath, ignorePaths)
-const contextContent = readFilesInDirectory(directoryPath, directoryPath, { ignorePaths })
+const { context: contextContent, tokensMap }
+  = readFilesInDirectory(directoryPath, directoryPath, { ignorePaths })
+const treeOutput = getTreeOutput(directoryPath, ignorePaths, tokensMap, directoryPath)
 const context = `${treeOutput}\n${contextContent}`
 
 writeFileSync(outputPath, context)
