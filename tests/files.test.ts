@@ -1,6 +1,6 @@
+import { Buffer } from 'node:buffer'
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { Buffer } from 'node:buffer'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { isBinaryFile, isJSONFile, readFilesInDirectory } from '../src/files.js'
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { parseArgs } from 'node:util'
+import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { cwd, exit } from 'node:process'
-import { writeFileSync } from 'node:fs'
+import { parseArgs } from 'node:util'
 import { estimateTokens, readFilesInDirectory } from './files.js'
 import { getTreeOutput } from './tree.js'
 import { VERSION } from './version.js'

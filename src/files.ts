@@ -1,6 +1,6 @@
-import { closeSync, openSync, readFileSync, readSync, readdirSync, statSync } from 'node:fs'
-import { extname, join, relative } from 'node:path'
 import { Buffer } from 'node:buffer'
+import { closeSync, openSync, readdirSync, readFileSync, readSync, statSync } from 'node:fs'
+import { extname, join, relative } from 'node:path'
 import { BINARY_CHECK_BUFFER_SIZE, DEFAULT_IGNORE_PATHS, MAX_JSON_ARRAY_ITEMS, MAX_JSON_ENTRIES } from './constants.js'
 import { matchesPattern } from './ignore.js'
 
@@ -60,7 +60,7 @@ export function truncateJSON(content: string): string {
   try {
     parsedJson = JSON.parse(content)
   }
-  catch (error) {
+  catch {
     return content
   }
 
