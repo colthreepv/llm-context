@@ -1,6 +1,7 @@
 export function matchesPattern(path: string, pattern: string): boolean {
-  const regex = new RegExp(
-    `^${pattern.replace(/\*/g, '.*').replace(/\?/g, '.')}$`,
-  )
+  const regexString = pattern
+    .replace(/\*/g, '.*')
+    .replace(/\?/g, '.')
+  const regex = new RegExp(regexString)
   return regex.test(path)
 }
