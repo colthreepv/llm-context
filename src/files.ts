@@ -101,9 +101,10 @@ export function readFilesInDirectory(
   }
 
   for (const file of files) {
-    if (ignorePaths.includes(file))
+    const rel = relative(basePath, join(directoryPath, file))
+    if (ignorePaths.includes(rel))
       continue
-    if (ignorePaths.some(pattern => matchesPattern(file, pattern)))
+    if (ignorePaths.some(pattern => matchesPattern(rel, pattern)))
       continue
 
     const filePath = join(directoryPath, file)

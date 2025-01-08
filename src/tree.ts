@@ -13,8 +13,8 @@ interface TreeNode {
 export function getTreeOutput(
   directoryPath: string,
   additionalPaths: string[] = [],
-  tokensMap?: Map<string, number>,
-  basePath?: string,
+  tokensMap: Map<string, number>,
+  basePath: string,
 ): string {
   const ignorePaths = [
     ...DEFAULT_IGNORE_PATHS,
@@ -30,8 +30,8 @@ export function getTreeOutput(
 function buildTree(
   dirPath: string,
   ignorePaths: string[],
-  tokensMap?: Map<string, number>,
-  basePath?: string,
+  tokensMap: Map<string, number>,
+  basePath: string,
 ): TreeNode {
   const name = basename(dirPath)
   const stats = statSync(dirPath)
@@ -42,9 +42,10 @@ function buildTree(
     const entries = readdirSync(dirPath)
 
     for (const entry of entries) {
-      if (ignorePaths.includes(entry))
+      const rel = relative(basePath, join(dirPath, entry))
+      if (ignorePaths.includes(rel))
         continue
-      if (ignorePaths.some(pattern => matchesPattern(entry, pattern)))
+      if (ignorePaths.some(pattern => matchesPattern(rel, pattern)))
         continue
 
       const fullPath = join(dirPath, entry)

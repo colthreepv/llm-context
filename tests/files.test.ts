@@ -111,6 +111,18 @@ describe('readFilesInDirectory', () => {
     expect(result).not.toContain('<file name="treefile.md">')
   })
 
+  it('should ignore nested folder like "web/src"', () => {
+    // Create web/src structure
+    mkdirSync(join(testDir, 'web', 'src'), { recursive: true })
+    writeFileSync(join(testDir, 'web', 'src', 'nestedFile.txt'), 'Hello')
+
+    const { context } = readFilesInDirectory(testDir, testDir, {
+      ignorePaths: ['web/src'],
+    })
+
+    expect(context).not.toContain('nestedFile.txt')
+  })
+
   it('should return tokensMap for each file', () => {
     const { tokensMap } = readFilesInDirectory(testDir, testDir)
 

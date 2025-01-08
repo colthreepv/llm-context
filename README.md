@@ -37,7 +37,7 @@ This creates `llm-context.context.txt` containing:
 
 Use `-i` or `--ignore` to exclude files/directories:
 ```bash
-llm-context ./src output -i "*.test.ts" -i cache -i docs
+llm-context ./src output -i "*.test.ts" -i cache -i docs -i web/src
 ```
 
 The ignore system uses a "greedy" pattern matching approach:
@@ -51,6 +51,7 @@ Examples:
 - `*.log` → matches `error.log`, `debug.log`
 - `test/*` → matches anything in the `test` directory
 - `.env.*` → matches `.env.local`, `.env.production`
+- `web/src` → matches `web/src/**/*`, but not something like `app/src/**/*`
 
 Default ignored paths include:
 - VCS: `.git`, `.gitignore`

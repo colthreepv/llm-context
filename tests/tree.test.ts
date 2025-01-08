@@ -19,7 +19,7 @@ describe('tree.util', () => {
 
   describe('getTreeOutput', () => {
     it('should generate tree output in XML format', () => {
-      const result = getTreeOutput(testDir)
+      const result = getTreeOutput(testDir, [], new Map<string, number>(), testDir)
       expect(result).toContain('<tree>')
       expect(result).toContain('.')
       expect(result).toContain('├── dir1')
@@ -30,8 +30,17 @@ describe('tree.util', () => {
 
     it('should respect ignore paths', () => {
       mkdirSync(join(testDir, 'node_modules'))
-      const result = getTreeOutput(testDir, ['node_modules'])
+      const result = getTreeOutput(testDir, ['node_modules'], new Map<string, number>(), testDir)
       expect(result).not.toContain('node_modules')
+    })
+
+    it('should ignore nested folder like "web/src"', () => {
+      // Create web/src structure
+      mkdirSync(join(testDir, 'web', 'src'), { recursive: true })
+      writeFileSync(join(testDir, 'web', 'src', 'nestedFile.txt'), 'Hello')
+
+      const result = getTreeOutput(testDir, ['node_modules', 'web/src'], new Map<string, number>(), testDir)
+      expect(result).not.toContain('nestedFile.txt')
     })
 
     it('should handle ignore wildcards', () => {
@@ -40,7 +49,7 @@ describe('tree.util', () => {
       writeFileSync(join(testDir, 'foofile.md'), '# Foo doc')
       writeFileSync(join(testDir, 'normal.txt'), 'Normal file')
 
-      const result = getTreeOutput(testDir, ['*foo*'])
+      const result = getTreeOutput(testDir, ['*foo*'], new Map<string, number>(), testDir)
 
       // Should include files without "tree"
       expect(result).toContain('file1.txt')
