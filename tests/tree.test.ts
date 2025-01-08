@@ -63,4 +63,22 @@ describe('tree.util', () => {
       expect(result).not.toContain('foofile.md')
     })
   })
+
+  it('should NOT ignore "login" folder by default', () => {
+    // Make sure the folder exists and has some file
+    mkdirSync(join(testDir, 'login'), { recursive: true })
+    writeFileSync(join(testDir, 'login', 'stuff.ts'), 'console.log("Login stuff")')
+
+    // Run getTreeOutput without custom ignores
+    const result = getTreeOutput(
+      testDir,
+      [],
+      new Map<string, number>(),
+      testDir,
+    )
+
+    // Confirm that "login" is present in the tree
+    expect(result).toContain('login')
+    expect(result).toContain('stuff.ts')
+  })
 })

@@ -130,3 +130,23 @@ describe('readFilesInDirectory', () => {
     expect(tokensMap.get('test.txt')).toBeGreaterThanOrEqual(1)
   })
 })
+
+describe('login dir ignore check', () => {
+  const testDir = join(__dirname, 'test-login')
+
+  beforeAll(() => {
+    rmSync(testDir, { recursive: true, force: true })
+    mkdirSync(join(testDir, 'login'), { recursive: true })
+    // Some dummy file to ensure the dir has content
+    writeFileSync(join(testDir, 'login', 'stuff.ts'), 'console.log("Login stuff")')
+  })
+
+  afterAll(() => {
+    rmSync(testDir, { recursive: true, force: true })
+  })
+
+  it('should NOT ignore login folder by default', () => {
+    const { context } = readFilesInDirectory(testDir, testDir)
+    expect(context).toContain('<file name="login/stuff.ts">')
+  })
+})
